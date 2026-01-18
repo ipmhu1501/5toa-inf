@@ -3,72 +3,142 @@
   <head>
     <base target="_top">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Académico Unificado</title>
+    <title>Blackboard 5toA - Informatica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-      :root { --primary: #003087; --accent: #CE1126; --text-main: #333; --bg: #f4f6f9; }
-      body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
-      .container { width: 100%; max-width: 600px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: fit-content; }
+      :root { --primary: #003087; --primary-dark: #00205b; --accent: #CE1126; --text-main: #333; --text-light: #666; --bg: #eef2f5; --white: #ffffff; }
+      body { font-family: 'Roboto', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+      
+      /* Header Institucional */
+      .header-bar { width: 100%; background-color: var(--primary); color: white; padding: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-bottom: 30px; }
+      .header-content { max-width: 800px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+      .header-title { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; }
+
+      .container { width: 90%; max-width: 700px; background: var(--white); padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
       .hidden { display: none; }
       
-      h2 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
-      input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
-      button { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s; font-weight: 600; margin-top: 10px; }
-      button:hover { background-color: #00205b; }
-      .btn-logout { background-color: transparent; color: var(--accent); border: 1px solid var(--accent); margin-bottom: 20px; }
-      .btn-logout:hover { background-color: var(--accent); color: white; }
-
-      .perfil-estudiante { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
-      .grid-perfil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px; }
+      h2 { color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 15px; margin-top: 0; font-weight: 500; }
+      h3 { color: var(--text-main); font-weight: 500; margin-top: 25px; }
       
-      .tarea-card { border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; margin-top: 15px; position: relative; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-      .tarea-valor { position: absolute; top: 20px; right: 20px; background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
-      .tag-materia { display: inline-block; background: #e3f2fd; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+      input, textarea, select { width: 100%; padding: 12px 15px; margin: 8px 0 20px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; transition: border 0.3s; background-color: #fafafa; }
+      input:focus, textarea:focus { border-color: var(--primary); outline: none; background-color: #fff; }
+      
+      label { font-size: 0.85rem; color: var(--text-light); font-weight: 500; display: block; margin-top: 5px; }
+
+      button { width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; transition: all 0.3s; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      button:hover { background-color: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+      button:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
+
+      .btn-logout { background-color: transparent; color: var(--text-light); border: 1px solid #ddd; margin-bottom: 20px; width: auto; padding: 8px 15px; font-size: 13px; float: right; margin-top: -10px; }
+      .btn-logout:hover { background-color: #f1f1f1; color: var(--accent); border-color: var(--accent); transform: none; box-shadow: none; }
+
+      .perfil-estudiante { background: #f8f9fa; padding: 25px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #eee; }
+      .grid-perfil { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 14px; }
+      .grid-perfil div { display: flex; flex-direction: column; }
+      .grid-perfil strong { color: var(--primary); margin-bottom: 4px; font-size: 0.8rem; text-transform: uppercase; }
+      
+      .tarea-card { border: 1px solid #e1e4e8; padding: 25px; border-radius: 6px; margin-top: 20px; position: relative; background: white; transition: transform 0.2s, box-shadow 0.2s; }
+      .tarea-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-color: var(--primary); }
+      
+      .tarea-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+      .tarea-valor { background: var(--accent); color: white; padding: 4px 10px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
+      .tag-materia { display: inline-block; background: #e8f0fe; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+      
+      .tarea-body strong { font-size: 1.15rem; color: #202124; display: block; margin-bottom: 8px; }
+      .tarea-body p { color: #5f6368; line-height: 1.6; font-size: 0.95rem; margin: 0 0 15px 0; }
+      
+      .tarea-footer { border-top: 1px solid #f1f3f4; padding-top: 12px; font-size: 0.85rem; color: #80868b; display: flex; justify-content: space-between; align-items: center; }
+      
+      /* Footer */
+      .footer-copy { text-align: center; margin-top: 40px; font-size: 0.8rem; color: #999; }
+
+      /* Adaptación para Celulares */
+      @media (max-width: 600px) {
+        .container { padding: 25px 20px; width: 92%; }
+        .header-content { flex-direction: column; gap: 5px; text-align: center; }
+        .btn-logout { float: none; width: 100%; margin-top: 0; margin-bottom: 15px; display: block; }
+        .grid-perfil { grid-template-columns: 1fr; }
+        .tarea-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+        h2 { font-size: 1.4rem; }
+      }
     </style>
   </head>
   <body>
 
+    <div class="header-bar">
+      <div class="header-content">
+        <div class="header-title">IPMHU | Blackboard</div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">5to A - Informática</div>
+      </div>
+    </div>
+
     <div class="container">
       <div id="login-section">
-        <h2 style="text-align:center">Portal Unificado</h2>
-        <p style="text-align:center; color:#666; margin-bottom:20px;">Ingrese sus credenciales institucionales</p>
+        <div style="text-align:center; margin-bottom: 30px;">
+          <h2 style="border:none; padding:0; margin-bottom:10px; color:var(--primary); font-size: 1.8rem;">Blackboard 5toA</h2>
+          <p style="color:#666; margin:0;">Acceso Institucional - Informática</p>
+        </div>
+        
+        <label>ID de Usuario</label>
         <input type="text" id="user-id" placeholder="ID de Usuario (Número de orden o ID)">
+        <label>Contraseña</label>
         <input type="password" id="user-pass" placeholder="Contraseña">
         <button onclick="intentarLogin()">Entrar al Sistema</button>
       </div>
 
       <div id="docente-section" class="hidden">
-        <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        <div style="overflow: hidden; margin-bottom: 10px;">
+          <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        </div>
         <h2 id="saludo-docente"></h2>
-        <p>Complete los datos para asignar una nueva tarea:</p>
+        <p style="color:var(--text-light); margin-bottom: 25px;">Complete los datos para asignar una nueva tarea al grupo.</p>
+        
+        <label>Materia / Módulo</label>
         <input type="text" id="t-materia" placeholder="Materia / Módulo">
+        <label>Título de la Actividad</label>
         <input type="text" id="t-titulo" placeholder="Título de la Tarea">
+        <label>Descripción Detallada</label>
         <textarea id="t-desc" rows="4" placeholder="Descripción detallada de la tarea"></textarea>
+        <label>Valor (Puntos / Porcentaje)</label>
         <input type="text" id="t-valor" placeholder="Valor de la tarea (ej: 10 pts / 20%)">
+        <label>Fecha Límite de Entrega</label>
+        <input type="date" id="t-fecha-limite">
         <button onclick="subirTarea()">Publicar en el Muro</button>
       </div>
 
       <div id="estudiante-section" class="hidden">
-        <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        <div style="overflow: hidden; margin-bottom: 10px;">
+          <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        </div>
         <h2 id="saludo-estudiante"></h2>
         
         <div class="perfil-estudiante">
-          <h3>Mis Datos Personales</h3>
+          <h3 style="margin-top:0; font-size:1rem; color:var(--primary); border-bottom:1px solid #e0e0e0; padding-bottom:10px; margin-bottom:15px;">Ficha del Estudiante</h3>
           <div class="grid-perfil">
-            <div><strong>Nombre:</strong> <span id="p-full-name"></span></div>
-            <div><strong>Número de Orden:</strong> <span id="p-orden"></span></div>
-            <div><strong>Correo:</strong> <span id="p-correo"></span></div>
-            <div><strong>Teléfono:</strong> <span id="p-tel"></span></div>
+            <div><strong>Nombre Completo</strong> <span id="p-full-name"></span></div>
+            <div><strong>Número de Orden</strong> <span id="p-orden"></span></div>
+            <div><strong>Correo Institucional</strong> <span id="p-correo"></span></div>
+            <div><strong>Teléfono</strong> <span id="p-tel"></span></div>
           </div>
         </div>
 
-        <h3>Tareas Publicadas</h3>
+        <h3>Muro de Tareas</h3>
         <div id="lista-tareas"></div>
+        
+        <div id="seccion-inactivas" class="hidden">
+          <h3 style="color:#999; margin-top:40px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1rem;">Historial (Vencidas)</h3>
+          <div id="lista-tareas-inactivas" style="opacity:0.7;"></div>
+        </div>
       </div>
+    </div>
+    
+    <div class="footer-copy">
+      &copy; 2026 DANIEL MEJIAS SRL
     </div>
 
     <script>
       let userData = null;
-      const API_URL = "https://script.google.com/macros/s/AKfycbwufn4c8ZaubSqpcNT91QFFLK23hYnD9IQMyfOwVCVasbct9P1oPu0ivq0BCYLGEUyo/exec";
+      const API_URL = "https://script.google.com/macros/s/AKfycbwQmHHQj10RCEYRJxaK8ImKNbcRphZxrfdG8pME802Phpkeqmm59Ucd8b_PXOOiwXw9/exec";
 
       function intentarLogin() {
         const id = document.getElementById('user-id').value;
@@ -94,6 +164,12 @@
           } else {
             alert("Acceso denegado. Verifique su ID y Password.");
           }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          alert("No se pudo conectar con la base de datos.\n\nCausa probable: La URL del Script es incorrecta o no está publicada como 'Cualquier persona'.\n\nError técnico: " + error.message);
+          btn.innerText = "Entrar al Sistema";
+          btn.disabled = false;
         });
       }
 
@@ -109,6 +185,14 @@
       function mostrarDocente() {
         document.getElementById('docente-section').classList.remove('hidden');
         document.getElementById('saludo-docente').innerText = "Panel Docente: " + userData.nombre;
+        
+        // Auto-asignar materia desde la base de datos (Columna I)
+        if (userData.materia) {
+          const campoMateria = document.getElementById('t-materia');
+          campoMateria.value = userData.materia;
+          campoMateria.readOnly = true; // Bloquea el campo para que no se edite
+          campoMateria.style.backgroundColor = "#e9ecef"; // Color gris para indicar que es automático
+        }
       }
 
       function mostrarEstudiante() {
@@ -130,21 +214,61 @@
         .then(response => response.json())
         .then(tareas => {
           const lista = document.getElementById('lista-tareas');
+          const listaInactivas = document.getElementById('lista-tareas-inactivas');
+          const secInactivas = document.getElementById('seccion-inactivas');
+          
+          lista.innerHTML = "";
+          listaInactivas.innerHTML = "";
+          
           if (tareas.length === 0) {
             lista.innerHTML = "<p>No hay tareas publicadas aún.</p>";
+            secInactivas.classList.add('hidden');
             return;
           }
-          // Mapeo basado en DB: 0:ID, 1:Docente, 2:Materia, 3:Titulo, 4:Desc, 5:Fecha, 6:Valor
-          lista.innerHTML = tareas.map(t => `
+          
+          // Mapeo basado en DB: 0:ID, 1:Docente, 2:Materia, 3:Titulo, 4:Desc, 5:Fecha, 6:Valor, 7:FechaLimite
+          tareas.reverse().forEach(t => {
+            let esInactiva = false;
+            let fechaLimStr = "";
+            
+            if (t[7]) {
+              const fechaLim = new Date(t[7]);
+              // Ajustamos al final del día para la comparación
+              const fechaLimFin = new Date(fechaLim);
+              fechaLimFin.setHours(23, 59, 59, 999);
+              
+              if (fechaLimFin < new Date()) esInactiva = true;
+              fechaLimStr = ` | <span style="color:${esInactiva ? '#d93025' : '#1a73e8'}; font-weight:bold;">Límite: ${fechaLim.toLocaleDateString()}</span>`;
+            }
+
+            const card = `
             <div class="tarea-card">
-              <div class="tarea-valor">${t[6]}</div>
-              <span class="tag-materia">${t[2]}</span><br>
-              <strong style="font-size:1.1rem; color:#333;">${t[3]}</strong>
-              <p style="margin: 10px 0; color:#555;">${t[4]}</p>
-              <hr style="border:0; border-top:1px solid #eee">
-              <small style="color:#888;">Prof: ${t[1]} | Publicado: ${t[5]}</small>
+              <div class="tarea-header">
+                <span class="tag-materia">${t[2]}</span>
+                <div class="tarea-valor">${t[6]}</div>
+              </div>
+              <div class="tarea-body">
+                <strong>${t[3]}</strong>
+                <p>${t[4]}</p>
+              </div>
+              <div class="tarea-footer">
+                <span>Prof. ${t[1]}</span>
+                <span>Publicado: ${t[5]}${fechaLimStr}</span>
+              </div>
             </div>
-          `).reverse().join('');
+            `;
+            
+            if (esInactiva) listaInactivas.innerHTML += card;
+            else lista.innerHTML += card;
+          });
+
+          if (listaInactivas.innerHTML !== "") secInactivas.classList.remove('hidden');
+          else secInactivas.classList.add('hidden');
+          
+          if (lista.innerHTML === "") lista.innerHTML = "<p>No hay tareas activas.</p>";
+        })
+        .catch(error => {
+          document.getElementById('lista-tareas').innerHTML = "<p style='color:red'>Error al cargar tareas. Verifique la conexión.</p>";
         });
       }
 
@@ -156,7 +280,8 @@
           materia: document.getElementById('t-materia').value,
           titulo: document.getElementById('t-titulo').value,
           desc: document.getElementById('t-desc').value,
-          valor: document.getElementById('t-valor').value
+          valor: document.getElementById('t-valor').value,
+          fechaLimite: document.getElementById('t-fecha-limite').value
         };
 
         if(!datos.materia || !datos.titulo) return alert("Materia y Título son obligatorios");
@@ -168,12 +293,26 @@
           method: "POST",
           body: JSON.stringify(datos)
         })
-        .then(response => response.json())
-        .then(() => {
+        .then(response => {
+          // Verificamos si Google nos bloqueó (Error 403/401)
+          if (!response.ok) throw new Error("Permiso denegado por Google (Error " + response.status + "). Revise que la implementación sea 'Cualquier persona'.");
+          return response.text();
+        })
+        .then(text => {
+           try { return JSON.parse(text); }
+           catch(e) { throw new Error("El servidor no respondió correctamente. Asegúrese de haber actualizado y desplegado el Script."); }
+        })
+        .then(res => {
+          if(!res.success) throw new Error(res.error || "Error desconocido");
           alert("Tarea publicada con éxito");
           btn.disabled = false;
           btn.innerText = "Publicar en el Muro";
           document.querySelectorAll('#docente-section input, #docente-section textarea').forEach(i => i.value = '');
+        })
+        .catch(error => {
+          alert("Error al publicar: " + error.message);
+          btn.disabled = false;
+          btn.innerText = "Publicar en el Muro";
         });
       }
     </script>
