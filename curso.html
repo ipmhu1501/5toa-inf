@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Académico Unificado</title>
+    <style>
+      :root { --primary: #003087; --accent: #CE1126; --text-main: #333; --bg: #f4f6f9; }
+      body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+      .container { width: 100%; max-width: 600px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: fit-content; }
+      .hidden { display: none; }
+      
+      h2 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+      input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
+      button { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s; font-weight: 600; margin-top: 10px; }
+      button:hover { background-color: #00205b; }
+      .btn-logout { background-color: transparent; color: var(--accent); border: 1px solid var(--accent); margin-bottom: 20px; }
+      .btn-logout:hover { background-color: var(--accent); color: white; }
+
+      .perfil-estudiante { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
+      .grid-perfil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px; }
+      
+      .tarea-card { border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; margin-top: 15px; position: relative; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+      .tarea-valor { position: absolute; top: 20px; right: 20px; background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
+      .tag-materia { display: inline-block; background: #e3f2fd; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      <div id="login-section">
+        <h2 style="text-align:center">Portal Unificado</h2>
+        <p style="text-align:center; color:#666; margin-bottom:20px;">Ingrese sus credenciales institucionales</p>
+        <input type="text" id="user-id" placeholder="ID de Usuario (Número de orden o ID)">
+        <input type="password" id="user-pass" placeholder="Contraseña">
+        <button onclick="intentarLogin()">Entrar al Sistema</button>
+      </div>
+
+      <div id="docente-section" class="hidden">
+        <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        <h2 id="saludo-docente"></h2>
+        <p>Complete los datos para asignar una nueva tarea:</p>
+        <input type="text" id="t-materia" placeholder="Materia / Módulo">
+        <input type="text" id="t-titulo" placeholder="Título de la Tarea">
+        <textarea id="t-desc" rows="4" placeholder="Descripción detallada de la tarea"></textarea>
+        <input type="text" id="t-valor" placeholder="Valor de la tarea (ej: 10 pts / 20%)">
+        <button onclick="subirTarea()">Publicar en el Muro</button>
+      </div>
+
+      <div id="estudiante-section" class="hidden">
+        <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        <h2 id="saludo-estudiante"></h2>
+        
+        <div class="perfil-estudiante">
+          <h3>Mis Datos Personales</h3>
+          <div class="grid-perfil">
+            <div><strong>Nombre:</strong> <span id="p-full-name"></span></div>
+            <div><strong>Número de Orden:</strong> <span id="p-orden"></span></div>
+            <div><strong>Correo:</strong> <span id="p-correo"></span></div>
+            <div><strong>Teléfono:</strong> <span id="p-tel"></span></div>
+          </div>
+        </div>
+
+        <h3>Tareas Publicadas</h3>
+        <div id="lista-tareas"></div>
+      </div>
+    </div>
+
+    <script>
+      let userData = null;
+      const API_URL = "https://script.google.com/macros/s/AKfycbwufn4c8ZaubSqpcNT91QFFLK23hYnD9IQMyfOwVCVasbct9P1oPu0ivq0BCYLGEUyo/exec";
+
+      function intentarLogin() {
+        const id = document.getElementById('user-id').value;
+        const pass = document.getElementById('user-pass').value;
+        const btn = document.querySelector('#login-section button');
+        
+        if(!id || !pass) return alert("Por favor ingrese usuario y contraseña");
+        
+        btn.innerText = "Verificando...";
+        btn.disabled = true;
+
+        fetch(`${API_URL}?action=login&id=${encodeURIComponent(id)}&password=${encodeURIComponent(pass)}`)
+        .then(response => response.json())
+        .then(res => {
+          btn.innerText = "Entrar al Sistema";
+          btn.disabled = false;
+          
+          if (res.success) {
+            userData = res;
+            document.getElementById('login-section').classList.add('hidden');
+            if (res.rol === 'Docente') mostrarDocente();
+            else mostrarEstudiante();
+          } else {
+            alert("Acceso denegado. Verifique su ID y Password.");
+          }
+        });
+      }
+
+      function logout() {
+        userData = null;
+        document.getElementById('docente-section').classList.add('hidden');
+        document.getElementById('estudiante-section').classList.add('hidden');
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('user-id').value = '';
+        document.getElementById('user-pass').value = '';
+      }
+
+      function mostrarDocente() {
+        document.getElementById('docente-section').classList.remove('hidden');
+        document.getElementById('saludo-docente').innerText = "Panel Docente: " + userData.nombre;
+      }
+
+      function mostrarEstudiante() {
+        document.getElementById('estudiante-section').classList.remove('hidden');
+        document.getElementById('saludo-estudiante').innerText = "Bienvenido(a), " + userData.nombre;
+        
+        // Cargar datos en el perfil
+        document.getElementById('p-full-name').innerText = userData.nombre + " " + userData.apellido;
+        document.getElementById('p-orden').innerText = userData.orden;
+        document.getElementById('p-correo').innerText = userData.correo;
+        document.getElementById('p-tel').innerText = userData.telefono;
+        
+        cargarTareas();
+      }
+
+      function cargarTareas() {
+        document.getElementById('lista-tareas').innerHTML = "<p>Cargando tareas...</p>";
+        fetch(`${API_URL}?action=getTareas`)
+        .then(response => response.json())
+        .then(tareas => {
+          const lista = document.getElementById('lista-tareas');
+          if (tareas.length === 0) {
+            lista.innerHTML = "<p>No hay tareas publicadas aún.</p>";
+            return;
+          }
+          // Mapeo basado en DB: 0:ID, 1:Docente, 2:Materia, 3:Titulo, 4:Desc, 5:Fecha, 6:Valor
+          lista.innerHTML = tareas.map(t => `
+            <div class="tarea-card">
+              <div class="tarea-valor">${t[6]}</div>
+              <span class="tag-materia">${t[2]}</span><br>
+              <strong style="font-size:1.1rem; color:#333;">${t[3]}</strong>
+              <p style="margin: 10px 0; color:#555;">${t[4]}</p>
+              <hr style="border:0; border-top:1px solid #eee">
+              <small style="color:#888;">Prof: ${t[1]} | Publicado: ${t[5]}</small>
+            </div>
+          `).reverse().join('');
+        });
+      }
+
+      function subirTarea() {
+        const btn = document.querySelector('#docente-section button');
+        const datos = {
+          action: "publicarTarea",
+          docente: userData.nombre + " " + userData.apellido,
+          materia: document.getElementById('t-materia').value,
+          titulo: document.getElementById('t-titulo').value,
+          desc: document.getElementById('t-desc').value,
+          valor: document.getElementById('t-valor').value
+        };
+
+        if(!datos.materia || !datos.titulo) return alert("Materia y Título son obligatorios");
+
+        btn.disabled = true;
+        btn.innerText = "Publicando...";
+
+        fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(datos)
+        })
+        .then(response => response.json())
+        .then(() => {
+          alert("Tarea publicada con éxito");
+          btn.disabled = false;
+          btn.innerText = "Publicar en el Muro";
+          document.querySelectorAll('#docente-section input, #docente-section textarea').forEach(i => i.value = '');
+        });
+      }
+    </script>
+  </body>
+</html>
